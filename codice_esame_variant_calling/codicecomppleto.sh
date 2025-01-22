@@ -11,18 +11,18 @@ cd analysis
 
 mkdir -p raw_data
 
-cd raw_data
+
 
 cd /config/workspace/datiesame
 
-tar -xzvf data_resequencing.tar.gz -C /config/workspace/class-variantcalling/analysis/raw_data
+tar -xzvf data_resequencing.tar.gz -C /config/workspace/class-variantcalling/analysis/raw_data # faccio tutto il tar, se non funziona, copio e incollo fino a .gz, poi sposto i file manualmente da datiesame a raw_data
 
 #per ottenere il path corretto di raw_data cliccare con tasto destro su raw_data
 #al posto del comando sopra riportato possiamo fare solo tar -xzvf data_resequencing.tar.gz e poi spostare manualmente i campioni
 
 cd ..
 
-cd class-variantcalling/analysis
+cd class-variantcalling/analysis 
 
 mkdir -p alignment
 
@@ -35,8 +35,8 @@ bwa mem \
 -t 2 \
 -R "@RG\tID:sim\tSM:normal\tPL:illumina\tLB:sim" \
 /config/workspace/datiesame/datasets_reference_only/sequence/Homo_sapiens_assembly38_chr21.fasta \
-/config/workspace/class-variantcalling/analysis/raw_data/normal_1.000+disease_0.000_1.fq.gz \
-/config/workspace/class-variantcalling/analysis/raw-data/normal_1.000+disease_0.000_2.fq.gz \
+/config/workspace/class-variantcalling/analysis/raw_data/normal_1.000+disease_0.000_1.fq.gz \   #ricordarsi di guardare se in raw_data coincidono, i primi control e il secondo case 
+/config/workspace/class-variantcalling/analysis/raw_data/normal_1.000+disease_0.000_2.fq.gz \
 | samtools view -@ 2 -bhS -o normal.bam -
 
 ## Real time: 176.099 sec; CPU: 256.669 sec
@@ -131,7 +131,7 @@ gatk --java-options "-Xmx4g" HaplotypeCaller  \
 
 ## then consolidate the 2 files
 
-mkdir -p tmp
+mkdir -p tmp     #sempre in variants 
 
 ### on AMD64 this code ######
 ## combine the files into one
@@ -157,7 +157,7 @@ gatk --java-options "-Xmx4g" GenotypeGVCFs \
 
 
 ### to execute snpeff we need to contain the memory
-snpEff -Xmx4g ann -dataDir /config/workspace/snpeff_data -v hg38 results.vcf.gz >results_ann.vcf
+snpEff -Xmx4g ann -dataDir /config/workspace/snpeff_data -v hg38 results.vcf.gz >results_ann.vcf    #potrebbe cambiare il nome di SNEPeff, potrebbe anche mettere sneepeff in cartelle diverse, quindi controlla il path di snepeff
 
 
 ### filter variants
