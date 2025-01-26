@@ -1,5 +1,5 @@
 pwd
-# /config/workspace
+# /config/workspace  
 
 mkdir -p class-variantcalling
 
@@ -20,7 +20,9 @@ tar -xzvf data_resequencing.tar.gz -C /config/workspace/class-variantcalling/ana
 #per ottenere il path corretto di raw_data cliccare con tasto destro su raw_data
 #al posto del comando sopra riportato possiamo fare solo tar -xzvf data_resequencing.tar.gz e poi spostare manualmente i campioni
 
-cd ..
+#devo tornare in workspace
+
+cd ..   
 
 cd class-variantcalling/analysis 
 
@@ -31,11 +33,13 @@ cd alignment
 ## now we can perform the alignment with BWA
 ##i nomi dei campioni, dopo raw_data, potrebbero cambiare all'esame
 
+#ricordarsi di guardare se in raw_data coincidono, i primi control e il secondo case 
+
 bwa mem \
 -t 2 \
 -R "@RG\tID:sim\tSM:normal\tPL:illumina\tLB:sim" \
 /config/workspace/datiesame/datasets_reference_only/sequence/Homo_sapiens_assembly38_chr21.fasta \
-/config/workspace/class-variantcalling/analysis/raw_data/normal_1.000+disease_0.000_1.fq.gz \   #ricordarsi di guardare se in raw_data coincidono, i primi control e il secondo case 
+/config/workspace/class-variantcalling/analysis/raw_data/normal_1.000+disease_0.000_1.fq.gz \   
 /config/workspace/class-variantcalling/analysis/raw_data/normal_1.000+disease_0.000_2.fq.gz \
 | samtools view -@ 2 -bhS -o normal.bam -
 
@@ -52,11 +56,13 @@ bwa mem \
 ## Real time: 173.232 sec; CPU: 256.204 sec
 
 
-# sort the bam file
+# sort the bam file --> controllare di avere sorted.bam
+
 samtools sort -o normal_sorted.bam normal.bam
 samtools sort -o disease_sorted.bam disease.bam
 
-# index the bam file
+# index the bam file  --> controllare sempre la presenza del file bam.bai 
+
 samtools index normal_sorted.bam
 samtools index disease_sorted.bam
 
@@ -105,8 +111,11 @@ gatk ApplyBQSR \
    --bqsr-recal-file disease_recal_data.table \
    -O disease_recal.bam
 
+# in alignment alla fine di tutti questi comandi devo avere 16 cartelle 
+
 
 ### variant calling
+
 
 cd ..
 
@@ -129,9 +138,11 @@ gatk --java-options "-Xmx4g" HaplotypeCaller  \
    -O disease.g.vcf.gz \
    -ERC GVCF
 
+
 ## then consolidate the 2 files
 
 mkdir -p tmp     #sempre in variants 
+
 
 ### on AMD64 this code ######
 ## combine the files into one
@@ -157,7 +168,10 @@ gatk --java-options "-Xmx4g" GenotypeGVCFs \
 
 
 ### to execute snpeff we need to contain the memory
-snpEff -Xmx4g ann -dataDir /config/workspace/snpeff_data -v hg38 results.vcf.gz >results_ann.vcf    #potrebbe cambiare il nome di SNEPeff, potrebbe anche mettere sneepeff in cartelle diverse, quindi controlla il path di snepeff
+
+#potrebbe cambiare il nome di SNEPeff, potrebbe anche mettere sneepeff in cartelle diverse, quindi controlla il path di snepeff
+
+snpEff -Xmx4g ann -dataDir /config/workspace/snpeff_data -v hg38 results.vcf.gz >results_ann.vcf    
 
 
 ### filter variants
